@@ -8,7 +8,7 @@ import (
 	"os"
 	"regexp"
 
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 
 	"github.com/sensiblecodeio/hookbot/pkg/hookbot"
 	"github.com/sensiblecodeio/hookbot/pkg/router/github"
