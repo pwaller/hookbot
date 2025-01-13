@@ -112,7 +112,7 @@ func main() {
 var SubscribeURIRE = regexp.MustCompile("^(?:/unsafe)?/sub")
 
 func ActionMakeTokens(c *cli.Context) {
-	key := c.GlobalString("key")
+	key := c.String("key")
 	if key == "<unset>" {
 		log.Fatalln("HOOKBOT_KEY not set")
 	}
@@ -180,8 +180,8 @@ func ActionMakeTokens(c *cli.Context) {
 	}
 }
 
-func ActionServe(c *cli.Context) {
-	key := c.GlobalString("key")
+func ActionServe(c *cli.Context) error {
+	key := c.String("key")
 	if key == "<unset>" {
 		log.Fatalln("HOOKBOT_KEY not set")
 	}
