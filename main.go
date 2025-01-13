@@ -117,7 +117,7 @@ func ActionMakeTokens(c *cli.Context) error {
 		log.Fatalln("HOOKBOT_KEY not set")
 	}
 
-	if len(c.Args()) < 1 {
+	if c.Args().Len() < 1 {
 		cli.ShowSubcommandHelp(c)
 		os.Exit(1)
 	}
@@ -146,7 +146,7 @@ func ActionMakeTokens(c *cli.Context) error {
 		return scheme + secure
 	}
 
-	for _, arg := range c.Args() {
+	for _, arg := range c.Args().Slice() {
 		argURL, err := url.Parse(arg)
 		if err != nil {
 			log.Fatalf("URL %q doesn't parse: %v", arg, err)
