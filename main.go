@@ -111,7 +111,7 @@ func main() {
 
 var SubscribeURIRE = regexp.MustCompile("^(?:/unsafe)?/sub")
 
-func ActionMakeTokens(c *cli.Context) {
+func ActionMakeTokens(c *cli.Context) error {
 	key := c.String("key")
 	if key == "<unset>" {
 		log.Fatalln("HOOKBOT_KEY not set")
@@ -178,6 +178,7 @@ func ActionMakeTokens(c *cli.Context) {
 			fmt.Println(u)
 		}
 	}
+	return nil
 }
 
 func ActionServe(c *cli.Context) error {
@@ -210,4 +211,5 @@ func ActionServe(c *cli.Context) error {
 	if err != nil {
 		log.Fatal(err)
 	}
+	return nil
 }

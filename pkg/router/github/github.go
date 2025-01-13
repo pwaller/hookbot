@@ -57,7 +57,7 @@ func MustMakeHeader(
 	return header
 }
 
-func ActionRoute(c *cli.Context) {
+func ActionRoute(c *cli.Context) error {
 
 	target, err := url.Parse(c.String("monitor-url"))
 	if err != nil {
@@ -120,6 +120,7 @@ func ActionRoute(c *cli.Context) {
 		router.Route(m, publish)
 	}
 	close(outbound)
+	return nil
 }
 
 type Event struct {
