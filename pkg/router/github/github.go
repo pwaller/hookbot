@@ -11,7 +11,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 
 	"github.com/sensiblecodeio/hookbot/pkg/hookbot"
 	"github.com/sensiblecodeio/hookbot/pkg/listen"
@@ -57,7 +57,7 @@ func MustMakeHeader(
 	return header
 }
 
-func ActionRoute(c *cli.Context) {
+func ActionRoute(c *cli.Context) error {
 
 	target, err := url.Parse(c.String("monitor-url"))
 	if err != nil {
@@ -74,7 +74,7 @@ func ActionRoute(c *cli.Context) {
 	outbound := make(chan listen.Message, 1)
 
 	publish := func(m hookbot.Message) bool {
-		token := Sha1HMAC(c.GlobalString("key"), []byte(m.Topic))
+		token := Sha1HMAC(c.String("key"), []byte(m.Topic))
 
 		outURL := fmt.Sprintf("https://%v@%v/pub/%s", token, target.Host, m.Topic)
 
@@ -111,7 +111,7 @@ func ActionRoute(c *cli.Context) {
 		topic := parts[0]
 		body := parts[1]
 
-		if !IsValidGithubSignature(c.GlobalString("github-secret"), body) {
+		if !IsValidGithubSignature(c.String("github-secret"), body) {
 			log.Printf("Reject github signature")
 			continue
 		}
@@ -120,6 +120,7 @@ func ActionRoute(c *cli.Context) {
 		router.Route(m, publish)
 	}
 	close(outbound)
+	return nil
 }
 
 type Event struct {

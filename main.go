@@ -8,7 +8,7 @@ import (
 	"os"
 	"regexp"
 
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 
 	"github.com/sensiblecodeio/hookbot/pkg/hookbot"
 	"github.com/sensiblecodeio/hookbot/pkg/router/github"
@@ -21,44 +21,44 @@ func main() {
 	app.Version = "0.14.0"
 
 	app.Flags = []cli.Flag{
-		cli.StringFlag{
-			Name:   "key",
-			Usage:  "secret known only for hookbot for URL access control",
-			Value:  "<unset>",
-			EnvVar: "HOOKBOT_KEY",
+		&cli.StringFlag{
+			Name:    "key",
+			Usage:   "secret known only for hookbot for URL access control",
+			Value:   "<unset>",
+			EnvVars: []string{"HOOKBOT_KEY"},
 		},
-		cli.StringFlag{
-			Name:   "github-secret",
-			Usage:  "secret known by github for signing messages",
-			Value:  "<unset>",
-			EnvVar: "HOOKBOT_GITHUB_SECRET",
+		&cli.StringFlag{
+			Name:    "github-secret",
+			Usage:   "secret known by github for signing messages",
+			Value:   "<unset>",
+			EnvVars: []string{"HOOKBOT_GITHUB_SECRET"},
 		},
 	}
 
-	app.Commands = []cli.Command{
+	app.Commands = []*cli.Command{
 		{
 			Name:   "serve",
 			Usage:  "start a hookbot instance, listening on http",
 			Action: ActionServe,
 			Flags: []cli.Flag{
-				cli.StringFlag{
+				&cli.StringFlag{
 					Name:  "bind, b",
 					Value: ":8080",
 					Usage: "address to listen on",
 				},
-				cli.StringFlag{
+				&cli.StringFlag{
 					Name:  "sslkey, k",
 					Value: "<unset>",
 					Usage: "path to the SSL secret key",
 				},
-				cli.StringFlag{
+				&cli.StringFlag{
 					Name:  "sslcrt, c",
 					Value: "<unset>",
 					Usage: "path to the SSL compound certificate",
 				},
-				cli.StringSliceFlag{
+				&cli.StringSliceFlag{
 					Name:  "router",
-					Value: &cli.StringSlice{},
+					Value: cli.NewStringSlice(""),
 					Usage: "list of routers to enable",
 				},
 			},
@@ -69,15 +69,15 @@ func main() {
 			Usage:   "given a list of URIs, generate tokens one per line",
 			Action:  ActionMakeTokens,
 			Flags: []cli.Flag{
-				cli.BoolFlag{
+				&cli.BoolFlag{
 					Name:  "bare",
 					Usage: "print only tokens (not as basic-auth URLs)",
 				},
-				cli.StringFlag{
-					Name:   "url-base, U",
-					Value:  "http://localhost:8080",
-					Usage:  "base URL to generate for (not included in hmac)",
-					EnvVar: "HOOKBOT_URL_BASE",
+				&cli.StringFlag{
+					Name:    "url-base, U",
+					Value:   "http://localhost:8080",
+					Usage:   "base URL to generate for (not included in hmac)",
+					EnvVars: []string{"HOOKBOT_URL_BASE"},
 				},
 			},
 		},
@@ -86,21 +86,21 @@ func main() {
 			Usage:  "route github requests",
 			Action: github.ActionRoute,
 			Flags: []cli.Flag{
-				cli.StringFlag{
+				&cli.StringFlag{
 					Name:  "monitor-url, u",
 					Usage: "URL to monitor",
 				},
-				cli.StringFlag{
-					Name:   "origin",
-					Value:  "samehost",
-					Usage:  "URL to use for the origin header ('samehost' is special)",
-					EnvVar: "HOOKBOT_ORIGIN",
+				&cli.StringFlag{
+					Name:    "origin",
+					Value:   "samehost",
+					Usage:   "URL to use for the origin header ('samehost' is special)",
+					EnvVars: []string{"HOOKBOT_ORIGIN"},
 				},
-				cli.StringSliceFlag{
-					Name:   "header, H",
-					Usage:  "headers to pass to the remote",
-					Value:  &cli.StringSlice{},
-					EnvVar: "HOOKBOT_HEADER",
+				&cli.StringSliceFlag{
+					Name:    "header, H",
+					Usage:   "headers to pass to the remote",
+					Value:   cli.NewStringSlice(""),
+					EnvVars: []string{"HOOKBOT_HEADER"},
 				},
 			},
 		},
@@ -111,13 +111,13 @@ func main() {
 
 var SubscribeURIRE = regexp.MustCompile("^(?:/unsafe)?/sub")
 
-func ActionMakeTokens(c *cli.Context) {
-	key := c.GlobalString("key")
+func ActionMakeTokens(c *cli.Context) error {
+	key := c.String("key")
 	if key == "<unset>" {
 		log.Fatalln("HOOKBOT_KEY not set")
 	}
 
-	if len(c.Args()) < 1 {
+	if c.Args().Len() < 1 {
 		cli.ShowSubcommandHelp(c)
 		os.Exit(1)
 	}
@@ -146,7 +146,7 @@ func ActionMakeTokens(c *cli.Context) {
 		return scheme + secure
 	}
 
-	for _, arg := range c.Args() {
+	for _, arg := range c.Args().Slice() {
 		argURL, err := url.Parse(arg)
 		if err != nil {
 			log.Fatalf("URL %q doesn't parse: %v", arg, err)
@@ -178,10 +178,11 @@ func ActionMakeTokens(c *cli.Context) {
 			fmt.Println(u)
 		}
 	}
+	return nil
 }
 
-func ActionServe(c *cli.Context) {
-	key := c.GlobalString("key")
+func ActionServe(c *cli.Context) error {
+	key := c.String("key")
 	if key == "<unset>" {
 		log.Fatalln("HOOKBOT_KEY not set")
 	}
@@ -210,4 +211,5 @@ func ActionServe(c *cli.Context) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	return nil
 }
