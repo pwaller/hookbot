@@ -21,13 +21,13 @@ func main() {
 	app.Version = "0.14.0"
 
 	app.Flags = []cli.Flag{
-		cli.StringFlag{
+		&cli.StringFlag{
 			Name:   "key",
 			Usage:  "secret known only for hookbot for URL access control",
 			Value:  "<unset>",
 			EnvVar: "HOOKBOT_KEY",
 		},
-		cli.StringFlag{
+		&cli.StringFlag{
 			Name:   "github-secret",
 			Usage:  "secret known by github for signing messages",
 			Value:  "<unset>",
@@ -41,22 +41,22 @@ func main() {
 			Usage:  "start a hookbot instance, listening on http",
 			Action: ActionServe,
 			Flags: []cli.Flag{
-				cli.StringFlag{
+				&cli.StringFlag{
 					Name:  "bind, b",
 					Value: ":8080",
 					Usage: "address to listen on",
 				},
-				cli.StringFlag{
+				&cli.StringFlag{
 					Name:  "sslkey, k",
 					Value: "<unset>",
 					Usage: "path to the SSL secret key",
 				},
-				cli.StringFlag{
+				&cli.StringFlag{
 					Name:  "sslcrt, c",
 					Value: "<unset>",
 					Usage: "path to the SSL compound certificate",
 				},
-				cli.StringSliceFlag{
+				&cli.StringSliceFlag{
 					Name:  "router",
 					Value: &cli.StringSlice{},
 					Usage: "list of routers to enable",
@@ -69,11 +69,11 @@ func main() {
 			Usage:   "given a list of URIs, generate tokens one per line",
 			Action:  ActionMakeTokens,
 			Flags: []cli.Flag{
-				cli.BoolFlag{
+				&cli.BoolFlag{
 					Name:  "bare",
 					Usage: "print only tokens (not as basic-auth URLs)",
 				},
-				cli.StringFlag{
+				&cli.StringFlag{
 					Name:   "url-base, U",
 					Value:  "http://localhost:8080",
 					Usage:  "base URL to generate for (not included in hmac)",
@@ -86,17 +86,17 @@ func main() {
 			Usage:  "route github requests",
 			Action: github.ActionRoute,
 			Flags: []cli.Flag{
-				cli.StringFlag{
+				&cli.StringFlag{
 					Name:  "monitor-url, u",
 					Usage: "URL to monitor",
 				},
-				cli.StringFlag{
+				&cli.StringFlag{
 					Name:   "origin",
 					Value:  "samehost",
 					Usage:  "URL to use for the origin header ('samehost' is special)",
 					EnvVar: "HOOKBOT_ORIGIN",
 				},
-				cli.StringSliceFlag{
+				&cli.StringSliceFlag{
 					Name:   "header, H",
 					Usage:  "headers to pass to the remote",
 					Value:  &cli.StringSlice{},
