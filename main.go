@@ -58,7 +58,7 @@ func main() {
 				},
 				&cli.StringSliceFlag{
 					Name:  "router",
-					Value: &cli.StringSlice{},
+					Value: cli.NewStringSlice(""),
 					Usage: "list of routers to enable",
 				},
 			},
